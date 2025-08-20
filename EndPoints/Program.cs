@@ -33,8 +33,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-
+// Register Middlewares
+app.UseMiddleware<RequestBodyLoggingMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<ResponseLoggingMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
 // Optional: migrate on startup (nice for dev)
