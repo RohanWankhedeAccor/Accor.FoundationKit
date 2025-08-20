@@ -5,11 +5,13 @@ public class RequestBodyLoggingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly Serilog.ILogger _logger;
+    private readonly IWebHostEnvironment _env;
 
-    public RequestBodyLoggingMiddleware(RequestDelegate next)
+    public RequestBodyLoggingMiddleware(RequestDelegate next, IWebHostEnvironment env)
     {
         _next = next;
         _logger = Log.ForContext<RequestBodyLoggingMiddleware>();
+        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -30,8 +32,11 @@ public class RequestBodyLoggingMiddleware
             request.Body.Position = 0; // reset for downstream middleware
         }
 
-        _logger.Information(" HTTP {Method} {Path} | Body: {RequestBody} | CorrelationId: {CorrelationId}",
-            method, path, LogMaskingHelper.MaskSensitiveData(body), context.TraceIdentifier);
+        if (_env.IsDevelopment())
+        {
+            _logger.Information("HTTP {Method} {Path} | Body: {RequestBody} | CorrelationId: {CorrelationId}",
+                method, path, LogMaskingHelper.MaskSensitiveData(body), context.TraceIdentifier);
+        }
 
         await _next(context);
     }
