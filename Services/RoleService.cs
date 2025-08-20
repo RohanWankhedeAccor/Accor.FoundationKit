@@ -1,4 +1,4 @@
-﻿using Business.Interfaces;
+using Business.Interfaces;
 using Common.DTOs.Users;
 using Data.Repositories;
 using Entities.Entites;
@@ -27,7 +27,7 @@ public class RoleService : BaseService<Role,
     // Optional: ensure DB-side ordering by name if your repo supports it
     public override async Task<IReadOnlyList<RoleItemDto>> ListAsync(CancellationToken ct = default)
     {
-        var roles = await _roleRepo.ListAsync(ct);
+        var roles = await _roleRepo.ListRolesAsync(ct);
         return roles.Select(MapToList).ToList();
     }
 

@@ -1,33 +1,66 @@
-# top-most EditorConfig file
+# Top-most EditorConfig file
 root = true
 
-# C# files
+# Apply to all C# files
 [*.cs]
 
-# Use UTF-8 encoding
-charset = utf-8
+##############################
+# Formatting Rules
+##############################
 
-# Indentation settings
+charset = utf-8
 indent_style = space
 indent_size = 4
-tab_width = 4
 insert_final_newline = true
+trim_trailing_whitespace = true
 
-# C# specific rules
+##############################
+# Naming Styles
+##############################
+
+# Use 'var' for built-in types
+csharp_style_var_for_built_in_types = true:suggestion
+
+# Use 'var' when type is obvious
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+# Avoid 'var' when type is not apparent
+csharp_style_var_elsewhere = false:silent
+
+# Async method names should end with 'Async'
+csharp_style_async_method_names = true:warning
+
+##############################
+# Code Style Rules
+##############################
+
 dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_event = false:suggestion
 
-csharp_style_var_for_built_in_types = true:suggestion
-csharp_style_var_when_type_is_apparent = true:suggestion
-csharp_style_var_elsewhere = false:suggestion
-
-csharp_style_expression_bodied_methods = false:suggestion
+csharp_style_expression_bodied_methods = false:silent
 csharp_style_prefer_switch_expression = true:suggestion
 csharp_style_namespace_declarations = file_scoped:suggestion
 
-# Naming rules
+##############################
+# File Layout (StyleCop)
+##############################
+
+# Require XML documentation on public APIs
+dotnet_diagnostic.SA1600.severity = warning
+
+# Require file to begin with a file header
+dotnet_diagnostic.SA1633.severity = none
+
+# Require elements to appear in correct order
+dotnet_diagnostic.SA1201.severity = suggestion
+dotnet_diagnostic.SA1202.severity = suggestion
+
+# Require using directives to be placed correctly
+dotnet_diagnostic.SA1200.severity = suggestion
+
+# Naming rules: private fields start with _camelCase
 dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
 dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
 dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case
@@ -38,3 +71,11 @@ dotnet_naming_symbols.private_fields.required_modifiers = readonly
 
 dotnet_naming_style.camel_case.capitalization = camel_case
 dotnet_naming_style.camel_case.required_prefix = _
+
+##############################
+# File-Specific Rules
+##############################
+
+[*.Designer.cs]
+# Allow auto-generated code to skip rules
+generated_code = true
