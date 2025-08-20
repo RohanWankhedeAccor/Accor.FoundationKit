@@ -25,6 +25,7 @@ public static class RolesEndpoints
         .Produces<ApiResponse<List<RoleItemDto>>>(StatusCodes.Status200OK);
 
         return app;
+
     }
 
 }
