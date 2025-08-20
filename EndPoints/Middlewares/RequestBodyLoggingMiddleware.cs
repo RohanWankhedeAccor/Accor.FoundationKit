@@ -31,7 +31,7 @@ public class RequestBodyLoggingMiddleware
         }
 
         _logger.Information(" HTTP {Method} {Path} | Body: {RequestBody} | CorrelationId: {CorrelationId}",
-            method, path, Truncate(body), context.TraceIdentifier);
+            method, path, LogMaskingHelper.MaskSensitiveData(body), context.TraceIdentifier);
 
         await _next(context);
     }

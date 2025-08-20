@@ -28,16 +28,10 @@ public class ResponseLoggingMiddleware
             context.Request.Method,
             context.Request.Path + context.Request.QueryString,
             context.Response.StatusCode,
-            Truncate(responseText),
+            LogMaskingHelper.MaskSensitiveData(responseText),
             context.TraceIdentifier);
 
         await responseBody.CopyToAsync(originalBodyStream); // Write back to actual response
     }
 
-    private string Truncate(string value, int maxLength = 1000)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return "[empty]";
-        return value.Length > maxLength ? value.Substring(0, maxLength) + "..." : value;
-    }
 }
