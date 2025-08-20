@@ -30,8 +30,13 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 // Add services to the container
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+// Add Health Checks
+app.MapCustomHealthChecks(); //  .../health page
+
 
 // Register Middlewares
 app.UseMiddleware<RequestBodyLoggingMiddleware>();

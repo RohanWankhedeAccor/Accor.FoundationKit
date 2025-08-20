@@ -32,6 +32,12 @@ public class RequestBodyLoggingMiddleware
             request.Body.Position = 0; // reset for downstream middleware
         }
 
+        if (_env.IsDevelopment() || request.Path.StartsWithSegments("/health"))
+        {
+            _logger.Information("💓 Health Check Request: {Method} {Path} | CorrelationId: {CorrelationId}",
+                method, path, context.TraceIdentifier);
+        }
+
         if (_env.IsDevelopment())
         {
             _logger.Information("HTTP {Method} {Path} | Body: {RequestBody} | CorrelationId: {CorrelationId}",
