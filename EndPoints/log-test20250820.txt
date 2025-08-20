@@ -1,0 +1,4 @@
+2025-08-20 11:56:54.292 +07:00 [INF] Application is starting...
+2025-08-20 11:56:55.123 +07:00 [WRN] Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'UserRole'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2025-08-20 11:56:57.877 +07:00 [INF] HTTP GET /swagger/index.html responded 200 in 66.085ms | CorrelationId: 0HNEVKNULGDKM:00000001
+2025-08-20 11:56:58.004 +07:00 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 8.127ms | CorrelationId: 0HNEVKNULGDKM:00000007

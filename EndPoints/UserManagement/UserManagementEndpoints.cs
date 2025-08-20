@@ -41,20 +41,6 @@ public static class UserManagementEndpoints
             ));
         });
 
-        //group.MapGet("", async ([AsParameters] PagedQuery q, IUserService svc, CancellationToken ct) =>
-        //{
-        //    var req = new PagingRequest
-        //    {
-        //        Page = q.Page,
-        //        PageSize = Math.Clamp(q.PageSize, 1, 200),
-        //        Search = q.Search,
-        //        Sort = q.Sort
-        //    };
-
-        //    var result = await svc.ListPagedAsync(req, ct);
-        //    return Results.Ok(result);
-        //});
-
         // GET /users/{id}
         group.MapGet("{id:guid}", async (Guid id, IUserService svc, HttpContext http, CancellationToken ct) =>
         {
@@ -94,6 +80,18 @@ public static class UserManagementEndpoints
                 ? Results.Ok(ApiResponseFactory.Success(true, "User deleted successfully.", http.TraceIdentifier))
                 : Results.NotFound(ApiResponseFactory.Fail("User not found", new List<string>(), 404, http.TraceIdentifier));
         });
+
+        // Get /Crash/ --- Test Error Handling 
+        var crashEndpoint = group.MapGet("crash", (HttpContext http) =>
+        {
+            throw new Exception("This is a test exception!");
+        });
+
+        crashEndpoint
+            .WithOpenApi()
+            .WithSummary("Crash endpoint to test global error handling")
+            .WithDescription("This always throws a test exception and should be caught by ErrorHandlerMiddleware.")
+            .WithName("CrashTest");
 
 
         return app;
