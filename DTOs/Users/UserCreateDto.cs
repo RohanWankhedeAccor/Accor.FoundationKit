@@ -1,6 +1,4 @@
-﻿// Common/DTOs/Users/UserCreateDto.cs
-using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Common.DTOs.Users;
 
 public record UserCreateDto(

@@ -1,7 +1,1 @@
-﻿namespace DTOs
-{
-    public class Usings
-    {
-
-    }
-}
+﻿global using System.ComponentModel.DataAnnotations;

@@ -1,5 +1,4 @@
-﻿// Common/DTOs/Users/UserListItemDto.cs
-namespace Common.DTOs.Users;
+﻿namespace Common.DTOs.Users;
 
 public record UserListItemDto(
     Guid Id,

@@ -1,10 +1,4 @@
-﻿// Business/Services/UserService.cs
-using Business.Interfaces;
-using Common.DTOs.Paging;
-using Common.DTOs.Users;
-using Data.Repositories;
-using Entities.Entites;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Business.Services;
 

@@ -1,9 +1,4 @@
-// Business/Services/BaseService.cs
-using Business.Interfaces;
-using Common.DTOs.Paging;
-using Data.Repositories;
-using Entities.Base;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Business.Services;
 
