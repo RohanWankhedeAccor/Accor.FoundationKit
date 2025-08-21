@@ -1,6 +1,4 @@
-﻿using DTOs.Shared;
-
-public class ErrorHandlerMiddleware
+﻿public class ErrorHandlerMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ErrorHandlerMiddleware> _logger;

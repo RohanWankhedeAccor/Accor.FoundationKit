@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-public class ResponseLoggingMiddleware
+﻿public class ResponseLoggingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly Serilog.ILogger _logger;
