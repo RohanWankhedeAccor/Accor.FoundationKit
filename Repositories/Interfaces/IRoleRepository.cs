@@ -1,4 +1,3 @@
-using Entities.Entites;
 
 namespace Data.Repositories
 {

@@ -1,7 +1,4 @@
-﻿using Serilog;
-using System.Text;
-
-public class RequestBodyLoggingMiddleware
+﻿public class RequestBodyLoggingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly Serilog.ILogger _logger;

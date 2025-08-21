@@ -1,5 +1,4 @@
-﻿// Common/DTOs/Users/UserDetailDto.cs
-namespace Common.DTOs.Users;
+﻿namespace Common.DTOs.Users;
 
 public record UserDetailDto(
     Guid Id,

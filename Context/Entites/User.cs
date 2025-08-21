@@ -1,9 +1,4 @@
-﻿
-
-using Entities.Base;
-
 namespace Entities.Entites;
-
 
 public class User : BaseEntity
 {

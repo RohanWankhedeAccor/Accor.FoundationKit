@@ -1,6 +1,4 @@
-﻿
 namespace Entities.Entites;
-
 public class UserRole
 {
     [Required]

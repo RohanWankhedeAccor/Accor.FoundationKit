@@ -1,6 +1,4 @@
-﻿// Common/DTOs/Users/UserUpdateDto.cs
-using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Common.DTOs.Users;
 
 public record UserUpdateDto(

@@ -1,7 +1,4 @@
-﻿using Serilog;
-using System.Diagnostics;
-
-public class RequestLoggingMiddleware
+﻿public class RequestLoggingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly Serilog.ILogger _logger;

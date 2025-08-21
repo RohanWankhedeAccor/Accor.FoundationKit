@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using System.Text.Json;
 
 public static class HealthCheckExtensions
 {

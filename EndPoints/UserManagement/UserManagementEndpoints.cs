@@ -1,9 +1,4 @@
-﻿using Business.Interfaces;
-using Common.DTOs;
-using Common.DTOs.Paging;
-using Common.DTOs.Users;
-using DTOs.Shared;
-using Microsoft.AspNetCore.Mvc;
+﻿
 
 
 public static class UserManagementEndpoints

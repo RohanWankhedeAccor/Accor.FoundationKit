@@ -1,5 +1,4 @@
-﻿namespace AppContext.Context;
-
+namespace AppContext.Context;
 
 public class AppDbContext : DbContext
 {

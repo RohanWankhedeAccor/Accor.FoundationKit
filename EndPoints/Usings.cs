@@ -1,1 +1,11 @@
-﻿
+﻿global using Business.Interfaces;
+global using Common.DTOs;
+global using Common.DTOs.Paging;
+global using Common.DTOs.Users;
+global using DTOs.Shared;
+global using Microsoft.AspNetCore.Mvc;
+global using Serilog;
+global using System.Diagnostics;
+global using System.Text;
+global using System.Text.Json;
+global using System.Text.Json.Nodes;

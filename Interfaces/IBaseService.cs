@@ -1,5 +1,3 @@
-﻿// Business/Interfaces/IBaseService.cs
-using Common.DTOs.Paging;
 
 namespace Business.Interfaces;
 
