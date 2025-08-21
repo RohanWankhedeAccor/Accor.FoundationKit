@@ -1,8 +1,3 @@
-﻿// Data/Repositories/UserRepository.cs
-using AppContext.Context;
-using Entities.Entites;
-using Microsoft.EntityFrameworkCore;
-
 namespace Data.Repositories;
 
 public class UserRepository : EfBaseRepository<User, Guid>, IUserRepository

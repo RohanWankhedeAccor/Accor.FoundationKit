@@ -1,6 +1,3 @@
-using AppContext.Context;
-using Entities.Entites;
-using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories;
 

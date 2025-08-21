@@ -1,7 +1,3 @@
-// Data/Repositories/EfBaseRepository.cs
-using AppContext.Context;
-using Microsoft.EntityFrameworkCore;
-
 namespace Data.Repositories;
 
 public class EfBaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>

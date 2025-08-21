@@ -1,5 +1,3 @@
-﻿// Data/Repositories/IUserRepository.cs
-using Entities.Entites;
 
 namespace Data.Repositories;
 

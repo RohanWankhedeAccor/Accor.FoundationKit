@@ -1,4 +1,3 @@
-// Data/Repositories/IBaseRepository.cs
 namespace Data.Repositories;
 
 public interface IBaseRepository<TEntity, TId>
