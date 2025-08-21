@@ -1,4 +1,4 @@
-﻿// Business/Services/BaseService.cs
+// Business/Services/BaseService.cs
 using Business.Interfaces;
 using Common.DTOs.Paging;
 using Data.Repositories;

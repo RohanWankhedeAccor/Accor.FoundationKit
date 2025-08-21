@@ -1,4 +1,6 @@
 ﻿using Business.Interfaces;
+using Common.DTOs.Users;
+using DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Endpoints.Roles;
@@ -10,13 +12,20 @@ public static class RolesEndpoints
         var group = app.MapGroup("/roles")
                        .WithTags("Roles");
 
-        // LIST ONLY
-        group.MapGet("/", async ([FromServices] IRoleService svc, CancellationToken ct) =>
+        // GET /roles — List all roles
+        group.MapGet("/", async ([FromServices] IRoleService svc, HttpContext http, CancellationToken ct) =>
         {
             var items = await svc.ListAsync(ct);
-            return Results.Ok(items);
-        });
+            return Results.Ok(ApiResponseFactory.Success(items, "Roles fetched successfully.", http.TraceIdentifier));
+        })
+        .WithName("GetAllRoles")
+        .WithOpenApi()
+        .WithSummary("Get all roles")
+        .WithDescription("Returns a list of all available roles in the system.")
+        .Produces<ApiResponse<List<RoleItemDto>>>(StatusCodes.Status200OK);
 
         return app;
+
     }
+
 }

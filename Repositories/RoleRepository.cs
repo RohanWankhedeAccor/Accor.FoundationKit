@@ -1,4 +1,4 @@
-﻿using AppContext.Context;
+using AppContext.Context;
 using Entities.Entites;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +13,7 @@ public class RoleRepository : EfBaseRepository<Role, Guid>, IRoleRepository
         _db = db;
     }
 
-    public async Task<IReadOnlyList<Role>> ListAsync(CancellationToken ct)
+    public async Task<IReadOnlyList<Role>> ListRolesAsync(CancellationToken ct)
         => await _db.Roles
             .AsNoTracking()
             .OrderBy(r => r.Name)

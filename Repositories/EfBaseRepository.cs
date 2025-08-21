@@ -1,4 +1,4 @@
-﻿// Data/Repositories/EfBaseRepository.cs
+// Data/Repositories/EfBaseRepository.cs
 using AppContext.Context;
 using Microsoft.EntityFrameworkCore;
 

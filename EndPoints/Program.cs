@@ -6,7 +6,6 @@ using Data.Repositories;
 using Logging;
 using Microsoft.EntityFrameworkCore;
 using Web.Endpoints.Roles;
-using Web.Endpoints.UserManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 //Call Serilog
@@ -29,7 +28,10 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 
 // Add services to the container
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations(); // important
+});
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
