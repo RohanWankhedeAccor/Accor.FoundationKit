@@ -1,5 +1,3 @@
-
-
 namespace Data.Repositories;
 
 public static class ServiceCollectionExtensions
