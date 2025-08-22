@@ -8,4 +8,10 @@
     <EnablePreviewFeatures>false</EnablePreviewFeatures>
     <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
+	<!-- Global usings applied to ALL projects in the solution -->
+	<ItemGroup>
+		<Using Include="System" />
+		<Using Include="System.Threading" />
+		<Using Include="System.Threading.Tasks" />
+	</ItemGroup>
 </Project>

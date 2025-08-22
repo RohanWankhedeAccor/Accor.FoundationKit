@@ -1,6 +1,5 @@
 using AppContext;
 using AppContext.Context;
-using Business.Interfaces;
 using Business.Services;
 using Data.Repositories;
 using Logging;
@@ -8,64 +7,74 @@ using Microsoft.EntityFrameworkCore;
 using Web.Endpoints.Roles;
 
 var builder = WebApplication.CreateBuilder(args);
-//Call Serilog
+
+// 1. Logging first
 LoggingConfigurator.ConfigureLogging(builder.Host, builder.Configuration);
 
-
-// Register DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Repositories
-builder.Services.AddScoped(typeof(IBaseRepository<,>), typeof(EfBaseRepository<,>)); // optional if you use generic directly
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-
-// Services
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-
-
-// Add services to the container
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+// 2. Service provider validation (catches DI mistakes at build time)
+builder.Host.UseDefaultServiceProvider(options =>
 {
-    options.EnableAnnotations(); // important
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
 });
+
+// 3. Register DbContext, Repositories & Domain services
+builder.Services
+    .AddRepositoriesAndDb(builder.Configuration)
+    .AddDomainServices();
+
+// 4. Platform services
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddHealthChecks();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(o => o.EnableAnnotations()); // keep annotations
 
 var app = builder.Build();
 
-// Add Health Checks
-app.MapCustomHealthChecks(); //  .../health page
+// 5) HTTPS redirection should be early
+app.UseHttpsRedirection();
 
+// 6) Serilog per-request log (cheap & structured)
+app.UseSerilogRequestLogging();
 
-// Register Middlewares
+// 7) Error handling should wrap everything after it
+app.UseMiddleware<ErrorHandlerMiddleware>();
+
+// 8) Request/Response logging order
+// Body logging (buffers) -> request meta logging -> response logging
 app.UseMiddleware<RequestBodyLoggingMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<ResponseLoggingMiddleware>();
-app.UseMiddleware<ErrorHandlerMiddleware>();
 
-// Optional: migrate on startup (nice for dev)
-using (var scope = app.Services.CreateScope())
+// 9) Health checks
+app.MapCustomHealthChecks(); // .../health
+
+// 10) Optional: migrate/seed gated by config to avoid prod surprises
+if (ShouldRunMigrations(builder.Configuration))
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();              // optional but handy
-    await SeedData.EnsureSeedRolesAsync(db);       // <-- seed roles here
+    await db.Database.MigrateAsync(app.Lifetime.ApplicationStopping);
+    await SeedData.EnsureSeedRolesAsync(db, app.Lifetime.ApplicationStopping);
 }
 
-// Configure the HTTP request pipeline
+// 11) Swagger only in Dev
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-
-// Map endpoints
+// 12) Endpoints
 app.MapUserManagementEndpoints();
 app.MapRolesEndpoints();
 
-app.UseHttpsRedirection();
-
 app.Run();
+
+// ---- local helpers ----
+static bool ShouldRunMigrations(IConfiguration config)
+{
+    // appsettings.*: { "Database": { "MigrateOnStartup": true, "SeedOnStartup": true } }
+    // You can split seeding flag if you like; here we reuse one helper for clarity.
+    return config.GetValue<bool>("Database:MigrateOnStartup", true);
+}
