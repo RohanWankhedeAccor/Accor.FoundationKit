@@ -1,41 +1,23 @@
-﻿public class ErrorHandlerMiddleware
+using EndPoints.Infrastructure.Errors;
+
+public sealed class ErrorHandlerMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ErrorHandlerMiddleware> _logger;
 
-    public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
+    public ErrorHandlerMiddleware(RequestDelegate next) => _next = next;
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task Invoke(HttpContext ctx)
     {
         try
         {
-            await _next(context); // Pass request to next middleware
+            await _next(ctx);
         }
         catch (Exception ex)
         {
-            var correlationId = context.TraceIdentifier;
-            var statusCode = 500;
-            var message = "An unexpected error occurred.";
-
-            _logger.LogError(ex, "Unhandled exception | CorrelationId: {CorrelationId}", correlationId);
-
-            var errorResponse = new ApiResponse<object>(
-                Status: "error",
-                HttpStatusCode: statusCode,
-                Message: message,
-                Data: null,
-                Errors: new List<string> { ex.Message }, // You can customize this to avoid internal info in prod
-                CorrelationId: correlationId,
-                Timestamp: DateTime.UtcNow
-            );
-
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = statusCode;
-            await context.Response.WriteAsJsonAsync(errorResponse);
+            var pd = ProblemMapping.ToProblem(ex, ctx);
+            ctx.Response.StatusCode = pd.Status ?? StatusCodes.Status500InternalServerError;
+            ctx.Response.ContentType = "application/problem+json";
+            await ctx.Response.WriteAsJsonAsync(pd);
         }
     }
 }
