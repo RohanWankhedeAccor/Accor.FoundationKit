@@ -1,4 +1,4 @@
-﻿
+using EndPoints.Results;         // ApiResults.Ok(...)
 
 namespace Web.Endpoints.Roles;
 
@@ -13,16 +13,15 @@ public static class RolesEndpoints
         group.MapGet("/", async ([FromServices] IRoleService svc, HttpContext http, CancellationToken ct) =>
         {
             var items = await svc.ListAsync(ct);
-            return Results.Ok(ApiResponseFactory.Success(items, "Roles fetched successfully.", http.TraceIdentifier));
+            return ApiResults.Ok(items, "Roles fetched successfully.", http);
         })
         .WithName("GetAllRoles")
         .WithOpenApi()
         .WithSummary("Get all roles")
         .WithDescription("Returns a list of all available roles in the system.")
-        .Produces<ApiResponse<List<RoleItemDto>>>(StatusCodes.Status200OK);
+        .Produces<ApiResponse<List<RoleItemDto>>>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         return app;
-
     }
-
 }
