@@ -4,10 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		D:\RWANKHEDE\Downloads\ProgressSummary.md = D:\RWANKHEDE\Downloads\ProgressSummary.md
-		D:\RWANKHEDE\Downloads\README.md = D:\RWANKHEDE\Downloads\README.md
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EndPoints", "EndPoints", "{F5D9175F-09FC-4D1F-BF3F-4B9BC2302CC3}"
 EndProject
