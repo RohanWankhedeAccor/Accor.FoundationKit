@@ -17,3 +17,4 @@ await app.MigrateAndSeedAsync();
 app.MapApplicationEndpoints();
 
 app.Run();
+
