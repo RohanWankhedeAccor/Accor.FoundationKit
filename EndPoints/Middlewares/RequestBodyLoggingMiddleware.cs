@@ -1,4 +1,5 @@
-﻿public class RequestBodyLoggingMiddleware
+namespace EndPoints.Middleware;
+public class RequestBodyLoggingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly Serilog.ILogger _logger;

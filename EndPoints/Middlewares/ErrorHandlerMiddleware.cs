@@ -1,41 +1,45 @@
-using EndPoints.Infrastructure.Errors;
-
 namespace EndPoints.Middleware;
-
 public sealed class ErrorHandlerMiddleware
 {
     private readonly RequestDelegate _next;
-    public ErrorHandlerMiddleware(RequestDelegate next) => _next = next;
+    private readonly ILogger<ErrorHandlerMiddleware> _log;
 
-    // Note: the middleware Invoke can receive DI services as extra parameters
-    public async Task Invoke(HttpContext context, IProblemDetailsService? problemDetailsService = null)
+    public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> log)
+    {
+        _next = next;
+        _log = log;
+    }
+
+    public async Task Invoke(HttpContext ctx, IProblemDetailsService problemDetails)
     {
         try
         {
-            await _next(context);
+            await _next(ctx);
         }
         catch (Exception ex)
         {
-            var pd = ProblemMapping.ToProblem(ex, context);
+            _log.LogError(ex, "Unhandled exception");
 
-            context.Response.Clear();
-            context.Response.StatusCode = pd.Status ?? StatusCodes.Status500InternalServerError;
-
-            if (problemDetailsService is not null)
+            if (ctx.Response.HasStarted)
             {
-                // Writes with "application/problem+json"
-                await problemDetailsService.WriteAsync(new ProblemDetailsContext
+                _log.LogWarning("Response already started; skipping problem write.");
+                return;
+            }
+
+            try
+            {
+                ctx.Response.Clear();
+                ctx.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+                await problemDetails.WriteAsync(new ProblemDetailsContext
                 {
-                    HttpContext = context,
-                    ProblemDetails = pd
+                    HttpContext = ctx,
+                    Exception = ex
                 });
             }
-            else
+            catch (ObjectDisposedException ode)
             {
-                // Fallback: still use the correct content type
-                context.Response.ContentType = "application/problem+json";
-                var jsonOpts = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                await context.Response.WriteAsJsonAsync(pd, jsonOpts, "application/problem+json");
+                _log.LogWarning(ode, "Response body disposed while writing problem details.");
             }
         }
     }

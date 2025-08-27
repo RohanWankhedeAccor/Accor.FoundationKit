@@ -36,20 +36,29 @@ public static class UserManagementEndpoints
         .Produces<ApiResponse<PaginatedResponse<UserListItemDto>>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status500InternalServerError);
 
-        // GET /users/{id}
         group.MapGet("{id:guid}", async (Guid id, IUserService svc, HttpContext http, CancellationToken ct) =>
         {
-            var user = await svc.GetAsync(id, ct);
-            if (user is null) throw new KeyNotFoundException($"User {id} not found");
-            return ApiResults.Ok(user, "User retrieved successfully.", http);
+            try
+            {
+                var user = await svc.GetAsync(id, ct);
+                if (user is null)
+                    return ApiResults.NotFound("User not found", http);
+
+                return ApiResults.Ok(user, "User retrieved successfully.", http);
+            }
+            catch (KeyNotFoundException)
+            {
+                // In case the service throws instead of returning null
+                return ApiResults.NotFound("User not found", http);
+            }
         })
         .WithName("GetUserById")
         .WithOpenApi()
         .WithSummary("Get user by ID")
         .WithDescription("Retrieves detailed user information using a unique identifier")
         .Produces<ApiResponse<UserDetailDto>>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status404NotFound)
-        .ProducesProblem(StatusCodes.Status500InternalServerError);
+        .Produces<ApiResponse<object>>(StatusCodes.Status404NotFound) // envelope for 404
+        .ProducesProblem(StatusCodes.Status500InternalServerError);   // unexpected errors  
 
         // POST /users
         group.MapPost("", async ([FromBody, Required] UserCreateDto dto, IUserService svc, HttpContext http, CancellationToken ct) =>
@@ -67,46 +76,61 @@ public static class UserManagementEndpoints
         .Accepts<UserCreateDto>("application/json");
 
         // PUT /users/{id}
-        group.MapPut("{id:guid}", async (Guid id, [FromBody, Required] UserUpdateDto dto, IUserService svc, HttpContext http, CancellationToken ct) =>
+        group.MapPut("{id:guid}", async (Guid id, [FromBody] UserUpdateDto dto, IUserService svc, HttpContext http, CancellationToken ct) =>
         {
-            var updated = await svc.UpdateAsync(id, dto, ct);
-            if (updated is null) throw new KeyNotFoundException($"User {id} not found");
-            return ApiResults.Ok(updated, "User updated successfully.", http);
+            try
+            {
+                var updated = await svc.UpdateAsync(id, dto, ct);
+
+                if (updated is null)
+                    return ApiResults.NotFound("User not found", http);
+
+                return ApiResults.Ok(updated, "User updated successfully.", http);
+            }
+            catch (KeyNotFoundException)
+            {
+                // In case the service throws instead of returning null
+                return ApiResults.NotFound("User not found", http);
+            }
         })
         .WithName("UpdateUser")
         .WithOpenApi()
         .WithSummary("Update an existing user")
         .WithDescription("Updates the specified user by ID with new values")
-        .Produces<ApiResponse<UserUpdateDto>>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status404NotFound)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status500InternalServerError)
-        .Accepts<UserUpdateDto>("application/json");
+        .Produces<ApiResponse<UserDetailDto>>(StatusCodes.Status200OK)
+        .Produces<ApiResponse<object>>(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         // DELETE /users/{id}
         group.MapDelete("{id:guid}", async (Guid id, IUserService svc, HttpContext http, CancellationToken ct) =>
         {
             var deleted = await svc.DeleteAsync(id, ct);
-            if (!deleted) throw new KeyNotFoundException($"User {id} not found");
-            return ApiResults.Ok(true, "User deleted successfully.", http);
+            return deleted
+                ? ApiResults.Ok(true, "User deleted successfully.", http)
+                : ApiResults.NotFound("User not found", http);
         })
         .WithName("DeleteUser")
         .WithOpenApi()
         .WithSummary("Delete a user by ID")
         .WithDescription("Removes a user from the system by unique ID")
         .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status404NotFound)
+        .Produces<ApiResponse<object>>(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         // Test Crash (verifies ErrorHandlerMiddleware -> ProblemDetails)
+        // GET /users/crash — return a 500 Problem instead of throwing
         group.MapGet("crash", (HttpContext http) =>
-        {
-            throw new Exception("This is a test exception!");
-        })
+            Results.Problem(
+                title: "Test crash endpoint",
+                detail: "This simulates a failure and returns ProblemDetails with 500.",
+                statusCode: StatusCodes.Status500InternalServerError
+            )
+        )
         .WithOpenApi()
         .WithName("CrashTest")
-        .WithSummary("Crash endpoint to test global error handling")
-        .WithDescription("This always throws a test exception and should be caught by ErrorHandlerMiddleware.");
+        .WithSummary("Crash endpoint to test error handling")
+        .WithDescription("Returns a ProblemDetails payload with 500 to simulate a crash.");
+
 
         return app;
     }
