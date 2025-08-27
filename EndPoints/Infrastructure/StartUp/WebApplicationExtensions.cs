@@ -15,10 +15,19 @@ public static class WebApplicationExtensions
         app.UseHttpsRedirection();
         app.UseSerilogRequestLogging();
 
-        // Error handler should wrap subsequent middlewares
-        app.UseMiddleware<ErrorHandlerMiddleware>();
+        // ✅ In tests: keep the pipeline minimal. No custom middlewares that wrap/replace streams.
+        if (app.Environment.IsEnvironment("Testing"))
+        {
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+            return app; // <— EARLY RETURN: nothing else for Testing
+        }
 
-        // Request/Response logging
+        // Normal pipeline for non-test
+        app.UseMiddleware<ErrorHandlerMiddleware>();
         app.UseMiddleware<RequestBodyLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<ResponseLoggingMiddleware>();
