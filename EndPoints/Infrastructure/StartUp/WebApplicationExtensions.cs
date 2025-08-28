@@ -4,6 +4,7 @@ using AppContext.Context;
 using EndPoints.Middleware;
 using global::Web.Endpoints.Roles;
 using Microsoft.EntityFrameworkCore;
+using Web.Endpoints.Users;
 
 namespace EndPoints.Infrastructure.StartUp;
 
