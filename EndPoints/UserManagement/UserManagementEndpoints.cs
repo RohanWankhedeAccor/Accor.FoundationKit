@@ -1,5 +1,9 @@
-using EndPoints.Results;
+// Web/Endpoints/UserManagementEndpoints.cs
+using EndPoints.Results;                   // ApiResults.Ok/CreatedAt/NotFound
+using FluentValidation;
 using System.ComponentModel.DataAnnotations;
+
+namespace Web.Endpoints.Users;
 
 public static class UserManagementEndpoints
 {
@@ -13,7 +17,7 @@ public static class UserManagementEndpoints
             var req = new PagingRequest
             {
                 Page = q.Page,
-                PageSize = Math.Clamp(q.PageSize, 1, 200),
+                PageSize = Math.Clamp(q.PageSize, 1, 200), // clamp only (paging validation tests later)
                 Search = q.Search,
                 Sort = q.Sort
             };
@@ -36,6 +40,7 @@ public static class UserManagementEndpoints
         .Produces<ApiResponse<PaginatedResponse<UserListItemDto>>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status500InternalServerError);
 
+        // GET /users/{id}
         group.MapGet("{id:guid}", async (Guid id, IUserService svc, HttpContext http, CancellationToken ct) =>
         {
             try
@@ -61,8 +66,15 @@ public static class UserManagementEndpoints
         .ProducesProblem(StatusCodes.Status500InternalServerError);   // unexpected errors  
 
         // POST /users
-        group.MapPost("", async ([FromBody, Required] UserCreateDto dto, IUserService svc, HttpContext http, CancellationToken ct) =>
+        group.MapPost("", async (
+            [FromBody, Required] UserCreateDto dto,
+            IValidator<UserCreateDto> validator,     // FluentValidation
+            IUserService svc,
+            HttpContext http,
+            CancellationToken ct) =>
         {
+            await validator.ValidateAndThrowAsync(dto, ct); // throws ValidationException -> 400 by your ProblemMapping
+
             var created = await svc.CreateAsync(dto, ct);
             return ApiResults.CreatedAt($"/users/{created.Id}", created, "User created successfully.", http);
         })
@@ -76,8 +88,16 @@ public static class UserManagementEndpoints
         .Accepts<UserCreateDto>("application/json");
 
         // PUT /users/{id}
-        group.MapPut("{id:guid}", async (Guid id, [FromBody] UserUpdateDto dto, IUserService svc, HttpContext http, CancellationToken ct) =>
+        group.MapPut("{id:guid}", async (
+            Guid id,
+            [FromBody] UserUpdateDto dto,
+            IValidator<UserUpdateDto> validator,     // FluentValidation
+            IUserService svc,
+            HttpContext http,
+            CancellationToken ct) =>
         {
+            await validator.ValidateAndThrowAsync(dto, ct); // throws ValidationException -> 400
+
             try
             {
                 var updated = await svc.UpdateAsync(id, dto, ct);
@@ -118,7 +138,6 @@ public static class UserManagementEndpoints
         .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         // Test Crash (verifies ErrorHandlerMiddleware -> ProblemDetails)
-        // GET /users/crash — return a 500 Problem instead of throwing
         group.MapGet("crash", (HttpContext http) =>
             Results.Problem(
                 title: "Test crash endpoint",
@@ -131,7 +150,11 @@ public static class UserManagementEndpoints
         .WithSummary("Crash endpoint to test error handling")
         .WithDescription("Returns a ProblemDetails payload with 500 to simulate a crash.");
 
-
         return app;
     }
 }
+
+// NOTE: These interfaces are assumed to be available via using statements in your project:
+// - IUserService
+// - PagedQuery, PagingRequest, PaginatedResponse<T>
+// - ApiResponse<T>, ApiResults (from EndPoints.Results)
