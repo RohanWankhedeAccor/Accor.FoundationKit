@@ -1,7 +1,7 @@
 // These two namespaces point to your extension methods that live in other projects:
 using Business.Services;      // .AddDomainServices()
-using Data.Repositories;      // .AddRepositoriesAndDb(config)
-using Microsoft.OpenApi.Models;
+using Data.Repositories;
+using Microsoft.OpenApi.Models;      // .AddRepositoriesAndDb(config)
 
 namespace EndPoints.Infrastructure.StartUp;
 
